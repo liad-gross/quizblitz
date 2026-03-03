@@ -41,3 +41,69 @@ export default {
 </script>
 
 What I used: I used the code above 
+
+Milestone 3:
+
+Prompt: "I'm building a Vue 3 quiz game using Vite and the Options API. Write a single-file component called QuestionCard. It receives one prop called question shaped like { question: String, answers: Array, correct: Number }. The template should display the question text and render four answer buttons using v-for. When a button is clicked: disable all buttons immediately, apply a green CSS class to the correct answer button and a red class to the clicked button if it was wrong, wait 1 second using setTimeout, then emit an event called 'answer' with the value true if the answer was correct or false if it was wrong. Reset the highlight state after emitting. Do not use TypeScript."
+
+Response: <template>
+  <div>
+    <p>{{ question.question }}</p>
+    <button
+      v-for="(answer, index) in question.answers"
+      :key="index"
+      :disabled="answered"
+      :class="getClass(index)"
+      @click="selectAnswer(index)"
+    >
+      {{ answer }}
+    </button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'QuestionCard',
+  props: {
+    question: {
+      type: Object,
+      required: true
+    }
+  },
+  emits: ['answer'],
+  data() {
+    return {
+      selected: null,
+      answered: false
+    }
+  },
+  methods: {
+    selectAnswer(index) {
+      this.selected = index
+      this.answered = true
+
+      const isCorrect = index === this.question.correct
+
+      setTimeout(() => {
+        this.$emit('answer', isCorrect)
+        this.selected = null
+        this.answered = false
+      }, 1000)
+    },
+    getClass(index) {
+      if (this.selected === null) return ''
+      if (index === this.question.correct) return 'correct'
+      if (index === this.selected) return 'wrong'
+      return ''
+    }
+  }
+}
+</script>
+
+<style scoped>
+.correct { background-color: green; color: white; }
+.wrong   { background-color: red;   color: white; }
+</style>
+
+What I used: I used the code claude provided since I read the output carefully and it included the elemnts the spec asked to check for. 
+
