@@ -1,6 +1,6 @@
 <template>
   <div>
-    <StartScreen @start="goToPlay" />
+    <StartScreen @start="startGame" />
   </div>
 </template>
 
@@ -11,7 +11,8 @@ export default {
   name: 'HomeView',
   components: { StartScreen },
   methods: {
-    goToPlay() {
+    startGame() {
+      sessionStorage.setItem('gameStarted', 'true')
       this.$router.push({ name: 'play' })
     }
   }
