@@ -1,15 +1,17 @@
 <template>
-  <div>
-    <p>{{ question.question }}</p>
-    <button
-      v-for="(answer, index) in question.answers"
-      :key="index"
-      :disabled="answered"
-      :class="getClass(index)"
-      @click="selectAnswer(index)"
-    >
-      {{ answer }}
-    </button>
+  <div class="question-card">
+    <p class="question-text">{{ question.question }}</p>
+    <div class="answers">
+      <button
+        v-for="(answer, index) in question.answers"
+        :key="index"
+        :class="buttonClass(index)"
+        :disabled="selectedAnswer !== null"
+        @click="selectAnswer(index)"
+      >
+        {{ answer }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -20,32 +22,22 @@ export default {
     question: {
       type: Object,
       required: true
+    },
+    selectedAnswer: {
+      type: Number,
+      default: null
     }
   },
   emits: ['answer'],
-  data() {
-    return {
-      selected: null,
-      answered: false
-    }
-  },
   methods: {
     selectAnswer(index) {
-      this.selected = index
-      this.answered = true
-
-      const isCorrect = index === this.question.correct
-
-      setTimeout(() => {
-        this.$emit('answer', isCorrect)
-        this.selected = null
-        this.answered = false
-      }, 1000)
+      if (this.selectedAnswer !== null) return
+      this.$emit('answer', index)
     },
-    getClass(index) {
-      if (this.selected === null) return ''
+    buttonClass(index) {
+      if (this.selectedAnswer === null) return ''
       if (index === this.question.correct) return 'correct'
-      if (index === this.selected) return 'wrong'
+      if (index === this.selectedAnswer) return 'wrong'
       return ''
     }
   }
@@ -53,6 +45,18 @@ export default {
 </script>
 
 <style scoped>
-.correct { background-color: green; color: white; }
-.wrong   { background-color: red;   color: white; }
+button.correct {
+  background-color: #4caf50;
+  color: white;
+}
+
+button.wrong {
+  background-color: #e53935;
+  color: white;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
 </style>
