@@ -12,9 +12,11 @@
     <p class="progress">
       Question {{ store.progress.current }} of {{ store.progress.total }}
     </p>
-<p v-if="store.streak >= 3" class="streak">
-  🔥 {{ store.streak }} in a row!
-</p>
+
+    <p v-if="store.streak >= 3" class="streak">
+      🔥 {{ store.streak }} in a row!
+    </p>
+
     <QuestionCard
       v-if="store.gameState === 'playing' && store.currentQuestion"
       :question="store.currentQuestion"
@@ -22,12 +24,23 @@
       @answer="store.submitAnswer"
     />
 
-    <ScoreBoard
-      v-else-if="store.gameState === 'end'"
-      :score="store.score"
-      :total="store.questions.length"
-      @restart="handleRestart"
-    />
+    <div v-else-if="store.gameState === 'end'" class="end-screen">
+      <h2>Game Over</h2>
+      <p>You scored {{ store.score }} of {{ store.questions.length }}</p>
+
+      <div v-if="!store.scoreSubmitted" class="submit-score">
+        <input
+          v-model="store.playerName"
+          placeholder="Enter your name"
+          class="name-input"
+        />
+        <button @click="store.submitScore()" class="submit-btn">Submit Score</button>
+      </div>
+
+      <p v-else class="submitted">Score submitted!</p>
+
+      <button @click="handleRestart" class="restart-btn">Play Again</button>
+    </div>
 
   </div>
 </template>
@@ -35,11 +48,10 @@
 <script>
 import { useGameStore } from '../stores/gameStore.js'
 import QuestionCard from '../components/QuestionCard.vue'
-import ScoreBoard from '../components/ScoreBoard.vue'
 
 export default {
   name: 'PlayView',
-  components: { QuestionCard, ScoreBoard },
+  components: { QuestionCard },
 
   setup() {
     const store = useGameStore()
@@ -54,6 +66,8 @@ export default {
 
   methods: {
     handleRestart() {
+      this.store.playerName = ''
+      this.store.scoreSubmitted = false
       this.store.resetGame()
       this.$router.push({ name: 'home' })
     }
@@ -71,13 +85,6 @@ export default {
   overflow: hidden;
 }
 
-.streak {
-  text-align: center;
-  font-weight: bold;
-  color: #f5c518;
-  font-size: 1.2rem;
-}
-
 .timer-fill {
   height: 100%;
   background: #4caf50;
@@ -92,5 +99,60 @@ export default {
   text-align: center;
   color: #aaa;
   margin-bottom: 1rem;
+}
+
+.streak {
+  text-align: center;
+  font-weight: bold;
+  color: #f5c518;
+  font-size: 1.2rem;
+}
+
+.end-screen {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.submit-score {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.name-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #1e1e1e;
+  color: white;
+  font-size: 1rem;
+}
+
+.submit-btn, .restart-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.submit-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.restart-btn {
+  background: #333;
+  color: white;
+  margin-top: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.submitted {
+  color: #4caf50;
+  margin: 1rem 0;
 }
 </style>

@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { questions as questionBank } from '../data/questions.js'
 
 export const useGameStore = defineStore('game', {
 
@@ -11,8 +10,10 @@ export const useGameStore = defineStore('game', {
     selectedAnswer: null,
     timeLeft: 15,
     _timerInterval: null,
-    streak: 0,        // add this
-    bestStreak: 0     // add this
+    streak: 0,
+    bestStreak: 0,
+    playerName: '',
+    scoreSubmitted: false
   }),
 
   getters: {
@@ -48,14 +49,32 @@ export const useGameStore = defineStore('game', {
       }
     },
 
-    startGame() {
-      this.questions = [...questionBank]
+    async startGame() {
+      const response = await fetch('http://localhost:3000/api/questions/random')
+      const questions = await response.json()
+      this.questions = questions
       this.currentIndex = 0
       this.score = 0
       this.gameState = 'playing'
       this.selectedAnswer = null
       this.timeLeft = 15
       this._startTimer()
+    },
+
+    async submitScore() {
+      if (!this.playerName.trim()) return
+      const response = await fetch('http://localhost:3000/api/scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerName: this.playerName,
+          score: this.score,
+          totalQuestions: this.questions.length
+        })
+      })
+      if (response.ok) {
+        this.scoreSubmitted = true
+      }
     },
 
     submitAnswer(answerIndex) {
@@ -67,7 +86,7 @@ export const useGameStore = defineStore('game', {
         this.score++
         this.streak++
         if (this.streak > this.bestStreak) this.bestStreak = this.streak
-        if (this.streak % 3 === 0) this.score++  // bonus every 3 in a row
+        if (this.streak % 3 === 0) this.score++
       } else {
         this.streak = 0
       }
@@ -98,7 +117,8 @@ export const useGameStore = defineStore('game', {
       this.timeLeft = 15
       this.streak = 0
       this.bestStreak = 0
-
+      this.playerName = ''
+      this.scoreSubmitted = false
     }
 
   }
