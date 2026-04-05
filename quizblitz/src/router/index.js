@@ -3,10 +3,14 @@ import { useGameStore } from '../stores/gameStore.js'
 import HomeView from '../views/HomeView.vue'
 import PlayView from '../views/PlayView.vue'
 import LeaderboardView from '../views/LeaderboardView.vue'
+import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
   { path: '/play', name: 'play', component: PlayView },
+  { path: '/login', name: 'login', component: LoginView },
+  { path: '/register', name: 'register', component: RegisterView },
   { path: '/leaderboard', name: 'leaderboard', component: LeaderboardView }
 ]
 

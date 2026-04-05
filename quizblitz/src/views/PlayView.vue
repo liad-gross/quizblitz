@@ -24,23 +24,26 @@
       @answer="store.submitAnswer"
     />
 
-    <div v-else-if="store.gameState === 'end'" class="end-screen">
-      <h2>Game Over</h2>
-      <p>You scored {{ store.score }} of {{ store.questions.length }}</p>
+    <div v-if="store.gameState === 'end'">
+  <h2>Game Over</h2>
+  <p>You scored {{ store.score }} / {{ store.questions.length }}</p>
 
-      <div v-if="!store.scoreSubmitted" class="submit-score">
-        <input
-          v-model="store.playerName"
-          placeholder="Enter your name"
-          class="name-input"
-        />
-        <button @click="store.submitScore()" class="submit-btn">Submit Score</button>
-      </div>
+  <div v-if="store.token">
+    <p>Playing as {{ store.userEmail }}</p>
+    <button v-if="!store.scoreSubmitted" @click="store.submitScore()">
+      Submit Score
+    </button>
+    <p v-else>Score submitted ✓</p>
+  </div>
 
-      <p v-else class="submitted">Score submitted!</p>
+  <div v-else>
+    <p>
+      <RouterLink to="/login">Log in</RouterLink> to save your score to the leaderboard.
+    </p>
+  </div>
 
-      <button @click="handleRestart" class="restart-btn">Play Again</button>
-    </div>
+  <button @click="handleRestart">Play Again</button>
+</div>
 
   </div>
 </template>
